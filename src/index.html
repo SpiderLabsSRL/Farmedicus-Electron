@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es-BO" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>NEOLED COCHABAMBA</title>
+    <meta
+      name="description"
+      content="NEOLED Cochabamba - Tienda especializada en productos LED de alta calidad. Encuentra tiras LED, focos LED, paneles LED, reflectores LED y luces RGB."
+    />
+    <meta name="keywords" content="luces LED, focos LED, tiras LED, iluminación LED, tienda LED Cochabamba, NEOLED" />
+    <meta name="author" content="NEOLED Cochabamba" />
+    <meta name="robots" content="index, follow" />
+    <meta name="google" content="notranslate" />
+    <meta http-equiv="Content-Language" content="es-BO" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="NEOLED COCHABAMBA" />
+    <meta property="og:description" content="Tienda especializada en productos LED de alta calidad en Cochabamba." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_BO" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="NEOLED COCHABAMBA" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+
+    <!-- Preconnect para mejor performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #ffffff;
+        color: #333333;
+      }
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+        padding: 20px;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #00aaff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      .logo {
+        font-weight: bold;
+        background: linear-gradient(45deg, #00aaff, #0066cc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+    </style>
+  </head>
+
+  <body class="notranslate">
+    <div id="root">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="logo">NEOLED COCHABAMBA</div>
+        <h2>Cargando aplicación...</h2>
+        <p>Por favor espera mientras cargamos la tienda LED.</p>
+      </div>
+    </div>
+
+    <script>
+      // Manejar errores de forma global
+      window.addEventListener("error", function (e) {
+        console.error("Error global capturado:", e.error);
+      });
+    </script>
+  </body>
+</html>
