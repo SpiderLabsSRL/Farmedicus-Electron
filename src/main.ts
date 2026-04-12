@@ -1,10 +1,81 @@
 import { app, BrowserWindow, session } from 'electron';
+import { spawn } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+let backendProcess: any = null;
+
 if (require('electron-squirrel-startup')) {
   app.quit();
+}
+
+function startBackend() {
+  // Buscar el backend en diferentes ubicaciones posibles
+  const possiblePaths = [
+    path.join(__dirname, '../../backend'),
+    path.join(process.cwd(), 'backend'),
+    path.join(app.getAppPath(), 'backend'),
+  ];
+  
+  let backendPath = null;
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      backendPath = p;
+      break;
+    }
+  }
+  
+  if (!backendPath) {
+    console.error('No se encontró la carpeta backend');
+    return;
+  }
+  
+  console.log('Iniciando backend desde:', backendPath);
+  
+  // Buscar el archivo principal
+  let entryFile = null;
+  const possibleEntries = ['server.js', 'index.js', 'app.js', 'src/server.js', 'src/index.js', 'src/app.js'];
+  
+  for (const entry of possibleEntries) {
+    const fullPath = path.join(backendPath, entry);
+    if (fs.existsSync(fullPath)) {
+      entryFile = fullPath;
+      break;
+    }
+  }
+  
+  if (!entryFile) {
+    console.error('No se encontró el archivo principal del backend');
+    return;
+  }
+  
+  console.log('Archivo principal:', entryFile);
+  
+  // Iniciar el proceso del backend
+  backendProcess = spawn('node', [entryFile], {
+    cwd: backendPath,
+    env: {
+      ...process.env,
+      NODE_ENV: 'development',
+      PORT: '5000',
+    },
+    stdio: 'pipe',
+  });
+  
+  backendProcess.stdout.on('data', (data) => {
+    console.log(`[Backend]: ${data}`);
+  });
+  
+  backendProcess.stderr.on('data', (data) => {
+    console.error(`[Backend Error]: ${data}`);
+  });
+  
+  backendProcess.on('close', (code) => {
+    console.log(`Backend process exited with code ${code}`);
+  });
 }
 
 function createWindow() {
@@ -23,7 +94,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Configurar CSP para permitir blob URLs
+  // Configurar CSP
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
@@ -34,13 +105,17 @@ app.whenReady().then(() => {
           "style-src 'self' 'unsafe-inline' https: http: data: blob:;",
           "font-src 'self' data: https: http: blob:;",
           "connect-src 'self' https: http: ws: wss: localhost:* 127.0.0.1:* data: blob:;",
-          "img-src 'self' data: https: http: blob:;",  // ← Agregado para permitir blob images
+          "img-src 'self' data: https: http: blob:;",
         ].join(' '),
       },
     });
   });
 
-  createWindow();
+  startBackend();
+  
+  setTimeout(() => {
+    createWindow();
+  }, 3000);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -51,6 +126,15 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    if (backendProcess) {
+      backendProcess.kill();
+    }
     app.quit();
+  }
+});
+
+app.on('will-quit', () => {
+  if (backendProcess) {
+    backendProcess.kill();
   }
 });
