@@ -1,22 +1,26 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+    "module": "esnext",
+
+    "moduleResolution": "bundler",
+
     "allowJs": true,
-    "module": "commonjs",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "noImplicitAny": false,
+
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "dist",
-    "moduleResolution": "node",
+
     "resolveJsonModule": true,
     "jsx": "react-jsx",
+
     "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+
     "types": ["node"],
+
     "paths": {
       "@/*": ["./src/renderer/*"]
     }

@@ -1,34 +1,28 @@
-const path = require('path');
+const path = require("path");
+const { rules } = require("./webpack.rules");
+const { plugins } = require("./webpack.plugins");
 
 module.exports = {
-  mode: 'development',
-  entry: './src/main.ts',
-  target: 'electron-main',
+  mode: "development",
+  entry: "./src/main.ts",
+  target: "electron-main",
+
   module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'ts-loader',
-          options: {
-            transpileOnly: true,
-            compilerOptions: {
-              module: 'commonjs',
-            },
-          },
-        },
-      },
-    ],
+    rules,
   },
+
+  plugins,
+
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: [".ts", ".js", ".json"],
   },
+
   output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, '.webpack'),
+    filename: "main.js",
+    path: path.resolve(__dirname, ".webpack"),
     clean: true,
   },
+
   node: {
     __dirname: false,
     __filename: false,
