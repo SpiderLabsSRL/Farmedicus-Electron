@@ -12,10 +12,24 @@ const rendererConfig = require('./webpack.renderer.config');
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    extraResource: [
+      './backend'
+    ],
+    // Excluir node_modules del backend y otros archivos innecesarios
+    ignore: [
+      /backend[/\\]node_modules/,
+      /\.git/,
+      /\.vscode/,
+      /\.DS_Store/,
+      /Thumbs\.db/,
+      /\.env\./,
+      /README\.md$/,
+      /\.gitignore$/
+    ]
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerZIP({}, ['win32']),
     new MakerZIP({}, ['darwin']),
     new MakerRpm({}),
     new MakerDeb({}),
@@ -28,7 +42,7 @@ const config: ForgeConfig = {
         config: rendererConfig,
         entryPoints: [
           {
-            html: './src/index.html',  // ← Ahora apunta a src/index.html
+            html: './src/index.html',
             js: './src/renderer.ts',
             name: 'main_window',
             preload: {

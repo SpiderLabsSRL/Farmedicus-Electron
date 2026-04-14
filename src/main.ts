@@ -13,18 +13,30 @@ if (require('electron-squirrel-startup')) {
 }
 
 function startBackend() {
-  // Buscar el backend en diferentes ubicaciones posibles
-  const possiblePaths = [
-    path.join(__dirname, '../../backend'),
-    path.join(process.cwd(), 'backend'),
-    path.join(app.getAppPath(), 'backend'),
-  ];
-  
   let backendPath = null;
-  for (const p of possiblePaths) {
-    if (fs.existsSync(p)) {
-      backendPath = p;
-      break;
+  
+  if (!app.isPackaged) {
+    // Modo desarrollo
+    const possiblePaths = [
+      path.join(__dirname, '../../backend'),
+      path.join(process.cwd(), 'backend'),
+      path.join(app.getAppPath(), 'backend'),
+    ];
+    
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        backendPath = p;
+        break;
+      }
+    }
+  } else {
+    // Modo producción - el backend está en resources
+    backendPath = path.join(process.resourcesPath, 'backend');
+    
+    // Verificar si existe
+    if (!fs.existsSync(backendPath)) {
+      console.error('Backend no encontrado en:', backendPath);
+      return;
     }
   }
   
@@ -37,7 +49,7 @@ function startBackend() {
   
   // Buscar el archivo principal
   let entryFile = null;
-  const possibleEntries = ['server.js', 'index.js', 'app.js', 'src/server.js', 'src/index.js', 'src/app.js'];
+  const possibleEntries = ['server.js', 'index.js', 'app.js'];
   
   for (const entry of possibleEntries) {
     const fullPath = path.join(backendPath, entry);
@@ -59,7 +71,7 @@ function startBackend() {
     cwd: backendPath,
     env: {
       ...process.env,
-      NODE_ENV: 'development',
+      NODE_ENV: app.isPackaged ? 'production' : 'development',
       PORT: '5000',
     },
     stdio: 'pipe',
@@ -90,7 +102,14 @@ function createWindow() {
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  
+  // ABRIR DEVTOOLS EN PRODUCCIÓN PARA DEBUG (temporal)
   mainWindow.webContents.openDevTools();
+  
+  // Escuchar errores de carga
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Error cargando página:', errorCode, errorDescription);
+  });
 }
 
 app.whenReady().then(() => {
@@ -113,15 +132,10 @@ app.whenReady().then(() => {
 
   startBackend();
   
+  // Dar tiempo al backend para iniciar
   setTimeout(() => {
     createWindow();
   }, 3000);
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
 });
 
 app.on('window-all-closed', () => {

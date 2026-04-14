@@ -22,8 +22,16 @@ module.exports = {
     path: path.resolve(__dirname, ".webpack/main"),
   },
 
+  // Configuración para manejar __dirname en producción
   node: {
     __dirname: false,
     __filename: false,
+  },
+  
+  // Importante: No procesar ciertos módulos
+  externals: {
+    'fs': 'commonjs fs',
+    'path': 'commonjs path',
+    'child_process': 'commonjs child_process',
   },
 };
